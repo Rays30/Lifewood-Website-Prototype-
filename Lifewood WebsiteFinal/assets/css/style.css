@@ -376,25 +376,56 @@ body.dark-mode .logo-image.header-logo {
 .nav-toggle.open span:nth-child(2) { opacity: 0; }
 .nav-toggle.open span:nth-child(3) { transform: rotate(45deg) translate(-5px, -6px); }
 
-/* Theme Toggle Button */
+/* Theme Toggle Button - UPDATED */
 .theme-toggle {
     background: none;
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
-    color: var(--text-primary); /* Icon color follows text color */
+    color: var(--text-primary); /* Icon color follows text color, but individual spans override */
     padding: 0.5rem;
-    position: relative;
-    z-index: 1001; /* Ensure toggle is clickable above overlay/nav */
-    transition: color 0.3s ease;
-    margin-left: var(--spacing-md); /* Space from nav */
+    position: relative; /* Essential for absolute positioning of spans */
+    width: 40px; /* Fixed width to contain icons */
+    height: 40px; /* Fixed height to contain icons */
+    display: flex; /* Use flexbox to center the icons if they weren't absolute */
+    justify-content: center;
+    align-items: center;
+    z-index: 1001; /* Above nav toggle */
+    transition: color 0.3s ease; /* For the button's base color, though icons handle visual */
 }
+
 .theme-toggle span {
     display: inline-block;
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    position: absolute; /* Stack icons on top of each other */
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%); /* Center the span itself */
+    font-size: 1.5rem; /* Ensure icon size */
+    transition: opacity 0.3s ease, transform 0.3s ease; /* Smooth transition for visible changes */
+    will-change: opacity, transform; /* Optimize for animation performance */
 }
-body.dark-mode .theme-toggle .icon-light { opacity: 0; transform: scale(0.8); }
-body.dark-mode .theme-toggle .icon-dark { opacity: 1; transform: scale(1); }
+
+/* Default state: Light mode (sun visible, moon hidden) */
+.theme-toggle .icon-light {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.theme-toggle .icon-dark {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8); /* Slightly smaller when hidden */
+}
+
+/* Dark mode state: (sun hidden, moon visible) */
+body.dark-mode .theme-toggle .icon-light {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+}
+
+body.dark-mode .theme-toggle .icon-dark {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
 
 
 /* --- 5. Footer --- */
