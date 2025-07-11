@@ -1449,9 +1449,10 @@ body.dark-mode .project-tag {
     position: fixed;
     top: var(--spacing-lg);
     right: var(--spacing-lg);
-    background-color: transparent; /* Ensure transparent background */
-    border: 2px solid var(--color-white); /* White outline */
-    color: var(--color-dark-serpent); /* Black X */
+    /* NEW STYLES BELOW */
+    background-color: var(--color-saffaron); /* Solid saffron background for high visibility */
+    border: none; /* No border needed as button has solid background */
+    color: var(--color-dark-serpent); /* Dark X on saffron background for strong contrast */
     border-radius: 50%; /* Make it circular */
     width: 40px; /* Fixed width for consistent circle */
     height: 40px; /* Fixed height for consistent circle */
@@ -1460,14 +1461,14 @@ body.dark-mode .project-tag {
     align-items: center;
     font-size: 1.8rem;
     cursor: pointer;
-    line-height: 1; /* Adjust line-height to prevent extra spacing */
-    transition: color 0.3s ease, transform 0.2s ease, border-color 0.3s ease; /* Include border-color in transition */
+    line-height: 1; /* Adjust line-height to prevent extra spacing for the X */
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease; /* Smooth transitions for hover */
     z-index: 10001; /* Ensure it's above the modal content and overlay */
 }
 
 .modal-close-button:hover {
-    color: var(--color-saffaron); /* X color changes to saffron on hover */
-    border-color: var(--color-saffaron); /* Outline color changes to saffron on hover */
+    background-color: var(--color-castleton-green); /* Change background to deep forest green on hover */
+    color: var(--color-white); /* Change X to white on hover for contrast */
     transform: rotate(90deg);
 }
 
