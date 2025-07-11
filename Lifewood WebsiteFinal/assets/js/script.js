@@ -1,222 +1,230 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Universal elements
+document.addEventListener('DOMContentLoaded', function() {
+    // --- Global Elements ---
     const body = document.body;
     const navToggle = document.querySelector('.nav-toggle');
-    const navList = document.querySelector('.main-nav .nav-list');
-    const navLinks = document.querySelectorAll('.main-nav .nav-list a');
-    const themeToggle = document.getElementById('theme-toggle');
-    const progressBar = document.getElementById('progressBar');
-    const scrollToTopBtn = document.getElementById('scroll-to-top');
+    const navList = document.querySelector('.nav-list');
     const navOverlay = document.querySelector('.nav-overlay');
+    const themeToggle = document.getElementById('theme-toggle');
+    const scrollToTopBtn = document.getElementById('scroll-to-top');
+    const progressBar = document.getElementById('progressBar');
 
-    // --- Navigation Toggle ---
-    navToggle.addEventListener('click', () => {
-        navToggle.classList.toggle('open');
+    // --- Header & Navigation Toggle ---
+    function toggleNav() {
         navList.classList.toggle('open');
-        body.classList.toggle('no-scroll');
+        navToggle.classList.toggle('open');
         navOverlay.classList.toggle('show');
-    });
+        body.classList.toggle('no-scroll'); // Prevent scroll when nav is open
+    }
 
-    // Close nav when a link is clicked
-    navLinks.forEach(link => {
+    navToggle.addEventListener('click', toggleNav);
+    navOverlay.addEventListener('click', toggleNav); // Close nav when overlay is clicked
+
+    // Close nav when a link is clicked (for single-page sites or smooth UX)
+    navList.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', () => {
-            navToggle.classList.remove('open');
-            navList.classList.remove('open');
-            body.classList.remove('no-scroll');
-            navOverlay.classList.remove('show');
+            if (navList.classList.contains('open')) {
+                toggleNav();
+            }
         });
     });
 
-    // Close nav when clicking on the overlay
-    navOverlay.addEventListener('click', () => {
-        navToggle.classList.remove('open');
-        navList.classList.remove('open');
-        body.classList.remove('no-scroll');
-        navOverlay.classList.remove('show');
-    });
-
     // --- Theme Toggle ---
-    const currentTheme = localStorage.getItem('theme');
-    if (currentTheme) {
-        body.classList.add(currentTheme);
+    function applyTheme(theme) {
+        body.classList.toggle('dark-mode', theme === 'dark');
+        localStorage.setItem('theme', theme);
+        // Update header logo filter immediately for correct display
+        const headerLogo = document.querySelector('.logo-image.header-logo');
+        if (headerLogo) {
+            if (theme === 'dark') {
+                headerLogo.style.filter = 'brightness(0) invert(1)';
+            } else {
+                headerLogo.style.filter = ''; // Reset to default
+            }
+        }
     }
 
+    // Check for saved theme preference
+    const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    applyTheme(savedTheme);
+
     themeToggle.addEventListener('click', () => {
-        body.classList.toggle('dark-mode');
-        let theme = 'light-mode';
-        if (body.classList.contains('dark-mode')) {
-            theme = 'dark-mode';
-        }
-        localStorage.setItem('theme', theme);
+        const currentTheme = body.classList.contains('dark-mode') ? 'dark' : 'light';
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        applyTheme(newTheme);
     });
 
-    // --- Scroll Progress Bar ---
+    // --- Scroll to Top Button ---
     window.addEventListener('scroll', () => {
-        const totalHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        const progress = (window.scrollY / totalHeight) * 100;
-        progressBar.style.width = progress + '%';
-
-        // Show/hide scroll-to-top button
-        if (window.scrollY > 300) {
+        if (window.scrollY > 300) { // Show button after scrolling 300px
             scrollToTopBtn.classList.add('show');
         } else {
             scrollToTopBtn.classList.remove('show');
         }
     });
 
-    // --- Scroll to Top Button ---
     scrollToTopBtn.addEventListener('click', () => {
         window.scrollTo({
             top: 0,
-            behavior: 'smooth'
+            behavior: 'smooth' // Smooth scroll to top
         });
     });
 
-    // --- AOS Initialization ---
-    AOS.init({
-        duration: 1000,
-        once: true,
-        mirror: false,
+    // --- Scroll Progress Bar ---
+    window.addEventListener('scroll', () => {
+        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight || document.body.clientHeight;
+        const scrolled = (scrollTop / (scrollHeight - clientHeight)) * 100;
+        progressBar.style.width = scrolled + '%';
     });
 
-    // --- Dynamic Year for Footer ---
-    // This finds all elements whose ID starts with "current-year"
+    // --- Initialize AOS ---
+    AOS.init({
+        duration: 800, // values from 0 to 3000, with step 50ms
+        once: true,    // whether animation should happen only once - while scrolling down
+    });
+
+
+    // --- Custom Modal System for Project Details ---
+    const projectCards = document.querySelectorAll('.project-card');
+    let modalOverlay = document.querySelector('.modal-overlay');
+
+    // Create modal elements if they don't exist
+    if (!modalOverlay) {
+        modalOverlay = document.createElement('div');
+        modalOverlay.classList.add('modal-overlay');
+        document.body.appendChild(modalOverlay);
+
+        const modalContentWrapper = document.createElement('div');
+        modalContentWrapper.classList.add('modal-content-wrapper');
+        modalOverlay.appendChild(modalContentWrapper);
+
+        const modalCloseButton = document.createElement('button');
+        modalCloseButton.classList.add('modal-close-button');
+        modalCloseButton.innerHTML = '×'; // 'x' icon
+        modalOverlay.appendChild(modalCloseButton); // Append to overlay, not content wrapper
+
+        // Add event listener for close button
+        modalCloseButton.addEventListener('click', closeModal);
+        // Close modal when clicking outside content (on overlay)
+        modalOverlay.addEventListener('click', (event) => {
+            if (event.target === modalOverlay) {
+                closeModal();
+            }
+        });
+        // Close modal with Escape key
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && modalOverlay.classList.contains('show')) {
+                closeModal();
+            }
+        });
+    }
+
+    const modalContentWrapper = modalOverlay.querySelector('.modal-content-wrapper');
+
+    function openModal(card) {
+        const title = card.dataset.title;
+        const image = card.dataset.image;
+        const fullDescription = card.dataset.fullDescription;
+        const tools = card.dataset.tools;
+        const date = card.dataset.date;
+        const role = card.dataset.role;
+        // githubLink and demoLink exist as data attributes, but we won't display them here
+        // const githubLink = card.dataset.githubLink;
+        // const demoLink = card.dataset.demoLink;
+
+        let modalHtml = `
+            <h3 class="modal-title">${title}</h3>
+            ${image ? `<img src="${image}" alt="${title}" class="modal-image">` : ''}
+            <p class="modal-description">${fullDescription}</p>
+            <div class="modal-info-section">
+                <h4>Project Details</h4>
+                <div class="modal-info-grid">
+                    <div class="modal-info-item">
+                        <span class="modal-info-label">Tools/Technologies:</span>
+                        <span class="modal-info-value">${tools || 'N/A'}</span>
+                    </div>
+                    <div class="modal-info-item">
+                        <span class="modal-info-label">Date:</span>
+                        <span class="modal-info-value">${date || 'N/A'}</span>
+                    </div>
+                    <div class="modal-info-item">
+                        <span class="modal-info-label">Our Role:</span>
+                        <span class="modal-info-value">${role || 'N/A'}</span>
+                    </div>
+                </div>
+            </div>
+            `;
+        
+        // Removed the "Relevant Links" section from here
+        // let linksHtml = '';
+        // if (githubLink || demoLink) {
+        //     linksHtml += '<div class="modal-links">';
+        //     linksHtml += '<h4>Relevant Links</h4>';
+        //     if (githubLink) {
+        //         linksHtml += `<a href="${githubLink}" target="_blank" class="modal-link">GitHub Repo</a>`;
+        //     }
+        //     if (demoLink) {
+        //         linksHtml += `<a href="${demoLink}" target="_blank" class="modal-link">Live Demo</a>`;
+        //     }
+        //     linksHtml += '</div>';
+        // }
+        // modalHtml += linksHtml; // Do not append linksHtml anymore
+
+        modalContentWrapper.innerHTML = modalHtml;
+        modalOverlay.classList.add('show');
+        body.classList.add('no-scroll'); // Prevent page scroll when modal is open
+    }
+
+    function closeModal() {
+        modalOverlay.classList.remove('show');
+        body.classList.remove('no-scroll'); // Allow page scroll
+        modalContentWrapper.scrollTop = 0; // Reset scroll position for next open
+    }
+
+    // Add click listener to each project card to open modal
+    projectCards.forEach(card => {
+        card.addEventListener('click', () => openModal(card));
+    });
+
+    // --- Footer Year ---
     const currentYearElements = document.querySelectorAll('[id^="current-year"]');
     currentYearElements.forEach(element => {
         element.textContent = new Date().getFullYear();
     });
 
-    // --- Project Card Modal ---
-    const projectCards = document.querySelectorAll('.project-card');
-    let modalOverlay = document.getElementById('projectModalOverlay');
-    let modalContent = document.getElementById('projectModalContent');
-    let modalCloseButton = document.getElementById('projectModalClose');
-
-    // Create modal elements if they don't exist (robustness)
-    if (!modalOverlay) {
-        modalOverlay = document.createElement('div');
-        modalOverlay.id = 'projectModalOverlay';
-        modalOverlay.className = 'modal-overlay';
-        document.body.appendChild(modalOverlay);
-
-        const modalContentWrapper = document.createElement('div');
-        modalContentWrapper.className = 'modal-content-wrapper';
-        modalOverlay.appendChild(modalContentWrapper);
-
-        modalCloseButton = document.createElement('button');
-        modalCloseButton.id = 'projectModalClose';
-        modalCloseButton.className = 'modal-close-button';
-        modalCloseButton.innerHTML = '&times;';
-        modalCloseButton.setAttribute('aria-label', 'Close project details');
-        modalOverlay.appendChild(modalCloseButton); // Append to overlay, not content wrapper
-
-        modalContent = document.createElement('div');
-        modalContent.id = 'projectModalContent';
-        modalContentWrapper.appendChild(modalContent);
-    }
-
-    projectCards.forEach(card => {
-        card.addEventListener('click', function() {
-            // Retrieve data from clicked card
-            const title = this.dataset.title;
-            const image = this.dataset.image;
-            const shortDescription = this.dataset.description; // Keep for reference if needed
-            const fullDescription = this.dataset.fullDescription; // NEW: Full description
-            const tools = this.dataset.tools; // NEW
-            const date = this.dataset.date; // NEW
-            const role = this.dataset.role; // NEW
-            const githubLink = this.dataset.githubLink; // NEW
-            const demoLink = this.dataset.demoLink; // NEW
-
-            // Build new modal content structure
-            let modalHtml = `
-                <h3>${title}</h3>
-                <img src="${image}" alt="${title}" class="modal-image" loading="lazy">
-                <p>${fullDescription || shortDescription}</p>
-                <div class="modal-info-section">
-                    <h4>Project Details</h4>
-                    <div class="modal-info-grid">
-                        ${tools ? `<div class="modal-info-item"><span class="modal-info-label">Tools/Technologies:</span> <span class="modal-info-value">${tools}</span></div>` : ''}
-                        ${date ? `<div class="modal-info-item"><span class="modal-info-label">Completion Date:</span> <span class="modal-info-value">${date}</span></div>` : ''}
-                        ${role ? `<div class="modal-info-item"><span class="modal-info-label">Role/Contribution:</span> <span class="modal-info-value">${role}</span></div>` : ''}
-                    </div>
-                </div>
-            `;
-
-            // Add links section if any links exist
-            if (githubLink || demoLink) {
-                modalHtml += `
-                    <div class="modal-info-section">
-                        <h4>Relevant Links</h4>
-                        <div class="modal-links">
-                            ${githubLink ? `<a href="${githubLink}" target="_blank" rel="noopener noreferrer" class="modal-link">GitHub Repo</a>` : ''}
-                            ${demoLink ? `<a href="${demoLink}" target="_blank" rel="noopener noreferrer" class="modal-link">Live Demo</a>` : ''}
-                        </div>
-                    </div>
-                `;
-            }
-            
-            modalContent.innerHTML = modalHtml;
-
-            // Show modal
-            modalOverlay.classList.add('show');
-            body.classList.add('no-scroll'); // Prevent scroll behind modal
-        });
-    });
-
-    // Close modal listeners
-    function closeModal() {
-        modalOverlay.classList.remove('show');
-        body.classList.remove('no-scroll'); // Re-enable scroll
-    }
-
-    modalCloseButton.addEventListener('click', closeModal);
-    modalOverlay.addEventListener('click', (e) => {
-        if (e.target === modalOverlay) { // Only close if clicked directly on overlay, not content
-            closeModal();
-        }
-    });
-
-    // Close modal on Escape key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modalOverlay.classList.contains('show')) {
-            closeModal();
-        }
-    });
-
-    // Form submission handling for contact page
+    // --- Contact Form Submission (Example - no actual backend) ---
     const contactForm = document.getElementById('contactForm');
     const formMessage = document.getElementById('formMessage');
 
     if (contactForm) {
-        contactForm.addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent default form submission
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
 
-            const name = document.getElementById('name').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const message = document.getElementById('message').value.trim();
+            // Simulate form submission
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
 
-            if (name === '' || email === '' || message === '') {
-                formMessage.textContent = 'Please fill in all required fields.';
-                formMessage.className = 'form-message error show'; // Add 'show' class to make it visible
-                formMessage.style.display = 'block'; // Ensure it's block
-            } else {
-                // Simulate form submission
-                console.log('Form submitted:', { name, email, subject: document.getElementById('subject').value.trim(), message });
-
+            if (name && email && message) {
+                // Simulate success
                 formMessage.textContent = 'Thank you for your message! We will get back to you soon.';
-                formMessage.className = 'form-message success show';
+                formMessage.classList.remove('error');
+                formMessage.classList.add('success');
                 formMessage.style.display = 'block';
-
-                contactForm.reset(); // Clear the form
-
-                // Hide message after a few seconds
-                setTimeout(() => {
-                    formMessage.classList.remove('show');
-                    formMessage.style.display = 'none';
-                }, 5000);
+                contactForm.reset();
+            } else {
+                // Simulate error
+                formMessage.textContent = 'Please fill in all required fields.';
+                formMessage.classList.remove('success');
+                formMessage.classList.add('error');
+                formMessage.style.display = 'block';
             }
+
+            setTimeout(() => {
+                formMessage.style.display = 'none';
+            }, 5000); // Hide message after 5 seconds
         });
     }
 
-});
+}); // End DOMContentLoaded
