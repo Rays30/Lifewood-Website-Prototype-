@@ -77,7 +77,7 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for theme change */
 }
 
-/* NEW: Overlay for mobile navigation */
+/* New: Overlay for mobile navigation */
 .nav-overlay {
     position: fixed;
     top: 0;
@@ -95,12 +95,11 @@ body {
     visibility: visible;
 }
 
-/* NEW: Prevent body scroll when mobile nav is open */
+/* New: Prevent body scroll when mobile nav is open */
 body.no-scroll {
     overflow: hidden;
     height: 100vh; /* Prevents scroll bounce on iOS */
 }
-
 
 .container {
     max-width: 1200px;
@@ -360,7 +359,7 @@ body.dark-mode .logo-image.header-logo {
     border: none;
     cursor: pointer;
     padding: 10px;
-    z-index: 1001; /* ADDED: Ensure toggle is clickable above overlay/nav */
+    z-index: 1001; /* Ensure toggle is clickable above overlay/nav */
 }
 
 .nav-toggle span {
@@ -386,7 +385,7 @@ body.dark-mode .logo-image.header-logo {
     color: var(--text-primary); /* Icon color follows text color */
     padding: 0.5rem;
     position: relative;
-    z-index: 1001; /* ADDED: Ensure toggle is clickable above overlay/nav */
+    z-index: 1001; /* Ensure toggle is clickable above overlay/nav */
     transition: color 0.3s ease;
     margin-left: var(--spacing-md); /* Space from nav */
 }
@@ -598,7 +597,7 @@ body.dark-mode .contact-icon {
 /* Overlay for text readability over video */
 .hero-section::before,
 .page-hero::before,
-.cta-banner::before { /* ADDED .cta-banner::before HERE */
+.cta-banner::before {
     content: '';
     position: absolute;
     top: 0;
@@ -1447,22 +1446,28 @@ body.dark-mode .project-tag {
 }
 
 .modal-close-button {
-    position: fixed; /* Changed to fixed position */
-    top: var(--spacing-lg); /* Adjusted for fixed positioning */
-    right: var(--spacing-lg); /* Adjusted for fixed positioning */
-    background: none;
-    border: none;
+    position: fixed;
+    top: var(--spacing-lg);
+    right: var(--spacing-lg);
+    background-color: transparent; /* Ensure transparent background */
+    border: 2px solid var(--color-white); /* White outline */
+    color: var(--color-dark-serpent); /* Black X */
+    border-radius: 50%; /* Make it circular */
+    width: 40px; /* Fixed width for consistent circle */
+    height: 40px; /* Fixed height for consistent circle */
+    display: flex; /* Use flexbox to center the X */
+    justify-content: center;
+    align-items: center;
     font-size: 1.8rem;
     cursor: pointer;
-    color: var(--color-black); /* Always white for visibility on dark overlay */
-    padding: var(--spacing-xs);
-    line-height: 1;
-    transition: color 0.3s ease, transform 0.2s ease;
+    line-height: 1; /* Adjust line-height to prevent extra spacing */
+    transition: color 0.3s ease, transform 0.2s ease, border-color 0.3s ease; /* Include border-color in transition */
     z-index: 10001; /* Ensure it's above the modal content and overlay */
 }
 
 .modal-close-button:hover {
-    color: var(--color-saffaron); /* Accent color on hover */
+    color: var(--color-saffaron); /* X color changes to saffron on hover */
+    border-color: var(--color-saffaron); /* Outline color changes to saffron on hover */
     transform: rotate(90deg);
 }
 
