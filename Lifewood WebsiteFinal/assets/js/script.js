@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         modalCloseButton = document.createElement('button');
         modalCloseButton.id = 'projectModalClose';
         modalCloseButton.className = 'modal-close-button';
-        modalCloseButton.innerHTML = '×';
+        modalCloseButton.innerHTML = '&times;';
         modalCloseButton.setAttribute('aria-label', 'Close project details');
         modalOverlay.appendChild(modalCloseButton); // Append to overlay, not content wrapper
 
