@@ -7,14 +7,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('theme-toggle');
     const progressBar = document.getElementById('progressBar');
     const scrollToTopBtn = document.getElementById('scroll-to-top');
-    const navOverlay = document.querySelector('.nav-overlay'); // NEW: Get the nav overlay
+    const navOverlay = document.querySelector('.nav-overlay');
 
     // --- Navigation Toggle ---
     navToggle.addEventListener('click', () => {
         navToggle.classList.toggle('open');
         navList.classList.toggle('open');
-        body.classList.toggle('no-scroll'); // NEW: Toggle no-scroll on body
-        navOverlay.classList.toggle('show'); // NEW: Toggle overlay visibility
+        body.classList.toggle('no-scroll');
+        navOverlay.classList.toggle('show');
     });
 
     // Close nav when a link is clicked
@@ -22,12 +22,12 @@ document.addEventListener('DOMContentLoaded', () => {
         link.addEventListener('click', () => {
             navToggle.classList.remove('open');
             navList.classList.remove('open');
-            body.classList.remove('no-scroll'); // NEW: Remove no-scroll
-            navOverlay.classList.remove('show'); // NEW: Hide overlay
+            body.classList.remove('no-scroll');
+            navOverlay.classList.remove('show');
         });
     });
 
-    // NEW: Close nav when clicking on the overlay
+    // Close nav when clicking on the overlay
     navOverlay.addEventListener('click', () => {
         navToggle.classList.remove('open');
         navList.classList.remove('open');
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
         element.textContent = new Date().getFullYear();
     });
 
-    // --- Project Card Modal (Ensure this part is correctly in your script.js if you have it) ---
+    // --- Project Card Modal ---
     const projectCards = document.querySelectorAll('.project-card');
     let modalOverlay = document.getElementById('projectModalOverlay');
     let modalContent = document.getElementById('projectModalContent');
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         modalCloseButton = document.createElement('button');
         modalCloseButton.id = 'projectModalClose';
         modalCloseButton.className = 'modal-close-button';
-        modalCloseButton.innerHTML = '&times;';
+        modalCloseButton.innerHTML = '×';
         modalCloseButton.setAttribute('aria-label', 'Close project details');
         modalOverlay.appendChild(modalCloseButton); // Append to overlay, not content wrapper
 
@@ -117,18 +117,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
     projectCards.forEach(card => {
         card.addEventListener('click', function() {
-            // Populate modal content
+            // Retrieve data from clicked card
             const title = this.dataset.title;
             const image = this.dataset.image;
-            const description = this.dataset.description;
-            const extraDetails = this.dataset.extraDetails;
+            const shortDescription = this.dataset.description; // Keep for reference if needed
+            const fullDescription = this.dataset.fullDescription; // NEW: Full description
+            const tools = this.dataset.tools; // NEW
+            const date = this.dataset.date; // NEW
+            const role = this.dataset.role; // NEW
+            const githubLink = this.dataset.githubLink; // NEW
+            const demoLink = this.dataset.demoLink; // NEW
 
-            modalContent.innerHTML = `
+            // Build new modal content structure
+            let modalHtml = `
                 <h3>${title}</h3>
                 <img src="${image}" alt="${title}" class="modal-image" loading="lazy">
-                <p>${description}</p>
-                ${extraDetails ? `<div class="extra-details"><h4>Further Details:</h4><p>${extraDetails}</p></div>` : ''}
+                <p>${fullDescription || shortDescription}</p>
+                <div class="modal-info-section">
+                    <h4>Project Details</h4>
+                    <div class="modal-info-grid">
+                        ${tools ? `<div class="modal-info-item"><span class="modal-info-label">Tools/Technologies:</span> <span class="modal-info-value">${tools}</span></div>` : ''}
+                        ${date ? `<div class="modal-info-item"><span class="modal-info-label">Completion Date:</span> <span class="modal-info-value">${date}</span></div>` : ''}
+                        ${role ? `<div class="modal-info-item"><span class="modal-info-label">Role/Contribution:</span> <span class="modal-info-value">${role}</span></div>` : ''}
+                    </div>
+                </div>
             `;
+
+            // Add links section if any links exist
+            if (githubLink || demoLink) {
+                modalHtml += `
+                    <div class="modal-info-section">
+                        <h4>Relevant Links</h4>
+                        <div class="modal-links">
+                            ${githubLink ? `<a href="${githubLink}" target="_blank" rel="noopener noreferrer" class="modal-link">GitHub Repo</a>` : ''}
+                            ${demoLink ? `<a href="${demoLink}" target="_blank" rel="noopener noreferrer" class="modal-link">Live Demo</a>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            modalContent.innerHTML = modalHtml;
 
             // Show modal
             modalOverlay.classList.add('show');
@@ -155,7 +183,6 @@ document.addEventListener('DOMContentLoaded', () => {
             closeModal();
         }
     });
-
 
     // Form submission handling for contact page
     const contactForm = document.getElementById('contactForm');
