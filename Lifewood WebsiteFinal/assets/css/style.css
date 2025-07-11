@@ -77,6 +77,31 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for theme change */
 }
 
+/* NEW: Overlay for mobile navigation */
+.nav-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Dark semi-transparent */
+    z-index: 998; /* Below mobile nav, above main content */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.nav-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* NEW: Prevent body scroll when mobile nav is open */
+body.no-scroll {
+    overflow: hidden;
+    height: 100vh; /* Prevents scroll bounce on iOS */
+}
+
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -335,7 +360,7 @@ body.dark-mode .logo-image.header-logo {
     border: none;
     cursor: pointer;
     padding: 10px;
-    z-index: 1100;
+    z-index: 1001; /* ADDED: Ensure toggle is clickable above overlay/nav */
 }
 
 .nav-toggle span {
@@ -361,7 +386,7 @@ body.dark-mode .logo-image.header-logo {
     color: var(--text-primary); /* Icon color follows text color */
     padding: 0.5rem;
     position: relative;
-    z-index: 1001; /* Above nav toggle */
+    z-index: 1001; /* ADDED: Ensure toggle is clickable above overlay/nav */
     transition: color 0.3s ease;
     margin-left: var(--spacing-md); /* Space from nav */
 }
@@ -1131,35 +1156,47 @@ body.dark-mode .scroll-to-top {
         flex-wrap: wrap; /* Allow items to wrap */
         justify-content: space-between; /* Space logo and toggles */
         padding: var(--spacing-sm) var(--spacing-md);
+        position: relative; /* Needed for z-index context */
+        z-index: 1000; /* Higher than mobile menu */
     }
     .main-nav .nav-list {
-        display: none; /* Hide nav links by default */
+        display: flex; /* Always display flex for the transition */
         flex-direction: column;
-        position: absolute;
-        top: 100%; /* Below the header */
+        position: fixed; /* CHANGED TO FIXED */
+        top: 0; /* Cover entire screen */
         left: 0;
         width: 100%;
+        height: 100vh; /* Full viewport height */
         background-color: var(--header-bg); /* Use variable for mobile menu */
         box-shadow: var(--box-shadow-medium);
-        padding: var(--spacing-md) 0;
-        z-index: 999;
-        transition: transform 0.3s ease-out;
-        transform: translateY(-100%); /* Start off-screen */
+        padding: var(--spacing-xxl) 0; /* More top/bottom padding for visual space */
+        z-index: 999; /* Below toggle buttons, above overlay */
+        transition: transform 0.3s ease-out, opacity 0.3s ease, visibility 0.3s ease;
+        transform: translateX(100%); /* Start off-screen to the right */
+        opacity: 0;
+        visibility: hidden;
+        justify-content: center; /* Center nav links vertically */
+        align-items: center; /* Center nav links horizontally */
     }
 
     .main-nav .nav-list.open {
-        display: flex; /* Show when open */
-        transform: translateY(0); /* Slide in */
+        transform: translateX(0); /* Slide in from right */
+        opacity: 1;
+        visibility: visible;
     }
 
     .main-nav .nav-list li {
         width: 100%;
         text-align: center;
+        margin-bottom: var(--spacing-md); /* Add spacing between items */
+    }
+    .main-nav .nav-list li:last-child {
+        margin-bottom: 0;
     }
 
     .main-nav .nav-list a {
         color: var(--text-primary); /* Links follow text color */
-        padding: 0.5rem 0;
+        padding: 0.8rem 0; /* Increase clickable area */
         display: block;
         font-size: 1.1rem;
     }
