@@ -1454,7 +1454,7 @@ body.dark-mode .project-tag {
     border: none;
     font-size: 1.8rem;
     cursor: pointer;
-    color: var(--color-white); /* Always white for visibility on dark overlay */
+    color: var(--color-black); /* Always white for visibility on dark overlay */
     padding: var(--spacing-xs);
     line-height: 1;
     transition: color 0.3s ease, transform 0.2s ease;
