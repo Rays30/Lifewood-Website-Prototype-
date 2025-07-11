@@ -393,7 +393,6 @@ body.dark-mode .logo-image.header-logo {
     display: inline-block;
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
-.theme-toggle .icon-dark { opacity: 0; transform: scale(0.8); }
 body.dark-mode .theme-toggle .icon-light { opacity: 0; transform: scale(0.8); }
 body.dark-mode .theme-toggle .icon-dark { opacity: 1; transform: scale(1); }
 
@@ -1449,7 +1448,6 @@ body.dark-mode .project-tag {
     position: fixed;
     top: var(--spacing-lg);
     right: var(--spacing-lg);
-    /* NEW STYLES BELOW */
     background-color: var(--color-saffaron); /* Solid saffron background for high visibility */
     border: none; /* No border needed as button has solid background */
     color: var(--color-dark-serpent); /* Dark X on saffron background for strong contrast */
@@ -1478,18 +1476,21 @@ body.dark-mode .project-tag {
     padding-right: calc(var(--spacing-xl) + 1.5rem); /* Add space for the fixed button */
 }
 
+/* NEW: Styles for modal content enhancements */
 .modal-content-wrapper h3 {
     font-size: clamp(1.8rem, 3vw, 2.5rem);
     margin-bottom: var(--spacing-md);
-    color: var(--text-primary); /* Keep consistent with page headings */
+    color: var(--text-primary);
+    text-align: center; /* Center the title */
 }
 
 .modal-content-wrapper img.modal-image {
     max-width: 100%;
     height: auto;
     border-radius: var(--border-radius-sm);
-    margin-bottom: var(--spacing-md);
+    margin: var(--spacing-md) auto var(--spacing-lg); /* Centered horizontally with margin-bottom */
     display: block; /* Ensures no extra space below image */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Subtle shadow for images */
 }
 
 .modal-content-wrapper p {
@@ -1498,14 +1499,78 @@ body.dark-mode .project-tag {
     color: var(--text-primary);
 }
 
-.modal-content-wrapper .extra-details {
+.modal-info-section {
     margin-top: var(--spacing-lg);
-    border-top: 1px solid var(--border-color);
     padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border-color);
 }
-.modal-content-wrapper .extra-details h4 {
-    color: var(--color-castleton-green); /* Green heading for extra details */
+
+.modal-info-section h4 {
+    color: var(--color-castleton-green); /* Green heading for section titles */
     margin-bottom: var(--spacing-sm);
+    font-size: 1.25rem;
+}
+
+.modal-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-sm) var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.modal-info-item p {
+    margin-bottom: 0.5rem; /* Smaller margin for info items */
+}
+
+.modal-info-label {
+    font-weight: 600; /* Bold label */
+    color: var(--color-saffaron); /* Saffron color for labels */
+    display: block; /* Make label appear above value if needed */
+    font-size: 0.95rem;
+}
+
+.modal-info-value {
+    color: var(--text-primary); /* Default text color for value */
+    font-size: 0.95rem;
+}
+
+.modal-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-md);
+}
+
+.modal-link {
+    display: inline-block;
+    padding: 0.6rem 1.2rem;
+    background-color: var(--color-castleton-green);
+    color: var(--color-white);
+    border-radius: var(--border-radius-sm);
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.modal-link:hover {
+    background-color: var(--color-dark-serpent);
+    transform: translateY(-2px);
+}
+
+/* Dark mode adjustments for modal specific elements */
+body.dark-mode .modal-info-label {
+    color: var(--color-earth-yellow);
+}
+body.dark-mode .modal-info-section h4 {
+    color: var(--color-earth-yellow);
+}
+body.dark-mode .modal-link {
+    background-color: var(--color-saffaron);
+    color: var(--color-dark-serpent);
+}
+body.dark-mode .modal-link:hover {
+    background-color: var(--color-earth-yellow);
+    color: var(--color-dark-serpent);
 }
 
 /* Mobile Responsiveness for Modal */
@@ -1524,5 +1589,11 @@ body.dark-mode .project-tag {
     }
     .modal-content-wrapper h3 {
         font-size: 1.5rem;
+    }
+    .modal-info-grid {
+        grid-template-columns: 1fr; /* Stack info items on small screens */
+    }
+    .modal-links {
+        justify-content: center; /* Center links on small screens */
     }
 }
